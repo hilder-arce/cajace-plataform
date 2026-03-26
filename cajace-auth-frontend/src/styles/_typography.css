@@ -1,0 +1,58 @@
+/* [ TYPOGRAPHY ] - JERARQUIA Y UTILIDADES GLOBALES */
+
+@layer base {
+  html {
+    font-family: var(--cajace-font-body);
+    font-size: 16px;
+    line-height: var(--cajace-leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-size: var(--cajace-text-base);
+    color: var(--cajace-text-primary);
+    font-family: var(--cajace-font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--cajace-font-body);
+    color: var(--cajace-text-primary);
+    font-weight: 700;
+    line-height: var(--cajace-leading-tight);
+    letter-spacing: -0.02em;
+  }
+
+  h1 { font-size: var(--cajace-text-5xl); }
+  h2 { font-size: var(--cajace-text-4xl); }
+  h3 { font-size: var(--cajace-text-3xl); }
+  h4 { font-size: var(--cajace-text-2xl); }
+  h5 { font-size: var(--cajace-text-xl); }
+  h6 { font-size: var(--cajace-text-lg); }
+
+  p {
+    margin-bottom: var(--cajace-space-4);
+    max-width: 65ch;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--cajace-font-mono);
+    font-size: 0.9em;
+  }
+
+  .font-display { font-family: var(--cajace-font-display); }
+  .font-body { font-family: var(--cajace-font-body); }
+  .font-mono { font-family: var(--cajace-font-mono); }
+  .text-muted { color: var(--cajace-text-muted); }
+  .text-accent { color: var(--cajace-accent); }
+  .text-danger { color: var(--cajace-danger); }
+  .text-success { color: var(--cajace-success); }
+}

@@ -1,0 +1,76 @@
+/* [CAJACE] Global stylesheet and Tailwind CSS v4 configuration */
+@import "tailwindcss";
+
+@import "./styles/_tokens.css";
+@import "./styles/_typography.css";
+@import "./styles/_base.css";
+@import "./styles/_animations.css";
+
+@theme {
+  /* COLORS */
+  --color-cajace-bg-canvas: var(--cajace-bg-canvas);
+  --color-cajace-bg-elevated: var(--cajace-bg-elevated);
+  --color-cajace-bg-overlay: var(--cajace-bg-overlay);
+
+  --color-cajace-surface: var(--cajace-surface);
+  --color-cajace-surface-muted: var(--cajace-surface-muted);
+  --color-cajace-surface-strong: var(--cajace-surface-strong);
+
+  --color-cajace-border-subtle: var(--cajace-border-subtle);
+  --color-cajace-border-strong: var(--cajace-border-strong);
+  --color-cajace-border-accent: var(--cajace-border-accent);
+
+  --color-cajace-accent: var(--cajace-accent);
+  --color-cajace-accent-strong: var(--cajace-accent-strong);
+  --color-cajace-accent-soft: var(--cajace-accent-soft);
+  --color-cajace-accent-ring: var(--cajace-accent-ring);
+
+  --color-cajace-text-primary: var(--cajace-text-primary);
+  --color-cajace-text-secondary: var(--cajace-text-secondary);
+  --color-cajace-text-muted: var(--cajace-text-muted);
+  --color-cajace-text-disabled: var(--cajace-text-disabled);
+  --color-cajace-text-inverse: var(--cajace-text-inverse);
+
+  --color-cajace-success: var(--cajace-success);
+  --color-cajace-warning: var(--cajace-warning);
+  --color-cajace-danger: var(--cajace-danger);
+  --color-cajace-info: var(--cajace-info);
+
+  /* SPACING */
+  --spacing-cajace-1: var(--cajace-space-1);
+  --spacing-cajace-2: var(--cajace-space-2);
+  --spacing-cajace-3: var(--cajace-space-3);
+  --spacing-cajace-4: var(--cajace-space-4);
+  --spacing-cajace-5: var(--cajace-space-5);
+  --spacing-cajace-6: var(--cajace-space-6);
+  --spacing-cajace-8: var(--cajace-space-8);
+  --spacing-cajace-10: var(--cajace-space-10);
+  --spacing-cajace-12: var(--cajace-space-12);
+  --spacing-cajace-16: var(--cajace-space-16);
+  
+  --spacing-cajace-sidebar: var(--cajace-sidebar-width);
+  --spacing-cajace-topbar: var(--cajace-topbar-height);
+
+  /* FONTS */
+  --font-cajace-display: var(--cajace-font-display);
+  --font-cajace-body: var(--cajace-font-body);
+  --font-cajace-mono: var(--cajace-font-mono);
+
+  /* SHADOWS */
+  --shadow-cajace-sm: var(--cajace-shadow-sm);
+  --shadow-cajace-md: var(--cajace-shadow-md);
+  --shadow-cajace-lg: var(--cajace-shadow-lg);
+  --shadow-cajace-card: var(--cajace-shadow-card);
+  --shadow-cajace-glow: var(--cajace-shadow-glow);
+
+  /* RADII */
+  --radius-cajace-sm: var(--cajace-radius-sm);
+  --radius-cajace-md: var(--cajace-radius-md);
+  --radius-cajace-lg: var(--cajace-radius-lg);
+  --radius-cajace-card: var(--cajace-radius-card);
+  --radius-cajace-pill: var(--cajace-radius-pill);
+
+  /* EASE */
+  --ease-cajace-out: var(--cajace-ease-out);
+  --ease-cajace-standard: var(--cajace-ease-standard);
+}
