@@ -1,5 +1,5 @@
-export const API_BASE_URL = 'http://localhost:3000/v1';
-export const SOCKET_URL = 'http://localhost:3000';
+export const API_BASE_URL = 'https://cajace-auth-backend.onrender.com/v1';
+export const SOCKET_URL = 'https://cajace-auth-backend.onrender.com';
 
 export const AUTH_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/auth/login`,
