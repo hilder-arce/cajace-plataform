@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { Observable, Subject, tap } from 'rxjs';
 import { Notification, RolePermissionsUpdatedEvent, UnreadCountResponse } from '../models/notification.models';
-import { API_BASE_URL, SOCKET_URL } from '../constants/api-routes.const';
+import { NOTIFICATIONS_ENDPOINTS, SOCKET_URL } from '../constants/api-routes.const';
 
 export interface PaginatedNotifications {
   items: Notification[];
@@ -83,18 +83,18 @@ export class NotificationsService {
       params = params.set('search', search);
     }
 
-    return this.http.get<PaginatedNotifications>(`${API_BASE_URL}/notifications/mias`, { 
+    return this.http.get<PaginatedNotifications>(NOTIFICATIONS_ENDPOINTS.MY_NOTIFICATIONS, {
       params, 
       withCredentials: true 
     });
   }
 
   getUnreadCount(): Observable<UnreadCountResponse> {
-    return this.http.get<UnreadCountResponse>(`${API_BASE_URL}/notifications/no-leidas`, { withCredentials: true });
+    return this.http.get<UnreadCountResponse>(NOTIFICATIONS_ENDPOINTS.UNREAD_COUNT, { withCredentials: true });
   }
 
   markAsRead(id: string): Observable<void> {
-    return this.http.patch<void>(`${API_BASE_URL}/notifications/${id}/leer`, {}, { withCredentials: true }).pipe(
+    return this.http.patch<void>(NOTIFICATIONS_ENDPOINTS.MARK_AS_READ(id), {}, { withCredentials: true }).pipe(
       tap(() => {
         this._unreadCount.update(count => Math.max(0, count - 1));
         this._notifications.update(list => list.map(n => n._id === id ? { ...n, leida: true } : n));
@@ -112,7 +112,7 @@ export class NotificationsService {
   }
 
   markAllAsRead(): Observable<void> {
-    return this.http.patch<void>(`${API_BASE_URL}/notifications/leer-todas`, {}, { withCredentials: true }).pipe(
+    return this.http.patch<void>(NOTIFICATIONS_ENDPOINTS.MARK_ALL_AS_READ, {}, { withCredentials: true }).pipe(
       tap(() => {
         this._unreadCount.set(0);
         this._notifications.update(list => list.map(n => ({ ...n, leida: true })));
@@ -121,7 +121,7 @@ export class NotificationsService {
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${API_BASE_URL}/notifications/${id}`, { withCredentials: true });
+    return this.http.delete<void>(NOTIFICATIONS_ENDPOINTS.DELETE(id), { withCredentials: true });
   }
 }
 

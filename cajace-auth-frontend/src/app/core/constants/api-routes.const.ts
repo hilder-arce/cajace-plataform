@@ -17,3 +17,35 @@ export const USERS_ENDPOINTS = {
   ME_UPDATE: `${API_BASE_URL}/users/me/update`,
   ME_CHANGE_PASSWORD: `${API_BASE_URL}/users/me/change-password`,
 };
+
+export const ROLES_ENDPOINTS = {
+  BASE: `${API_BASE_URL}/roles`,
+  DELETED: `${API_BASE_URL}/roles/deleted`,
+  BY_ID: (id: string) => `${API_BASE_URL}/roles/${id}`,
+  RESTORE: (id: string) => `${API_BASE_URL}/roles/${id}/restore`,
+  INACTIVE: (id: string) => `${API_BASE_URL}/roles/${id}/role-inactivo`,
+};
+
+export const PERMISSIONS_ENDPOINTS = {
+  BASE: `${API_BASE_URL}/permissions`,
+  DELETED: `${API_BASE_URL}/permissions/deleted`,
+  BY_ID: (id: string) => `${API_BASE_URL}/permissions/${id}`,
+  RESTORE: (id: string) => `${API_BASE_URL}/permissions/${id}/restore`,
+  INACTIVE: (id: string) => `${API_BASE_URL}/permissions/${id}/permiso-inactivo`,
+};
+
+export const MODULES_ENDPOINTS = {
+  BASE: `${API_BASE_URL}/modules`,
+  DELETED: `${API_BASE_URL}/modules/deleted`,
+  BY_ID: (id: string) => `${API_BASE_URL}/modules/${id}`,
+  RESTORE: (id: string) => `${API_BASE_URL}/modules/${id}/restore`,
+  INACTIVE: (id: string) => `${API_BASE_URL}/modules/${id}/modulo-inactivo`,
+};
+
+export const NOTIFICATIONS_ENDPOINTS = {
+  MY_NOTIFICATIONS: `${API_BASE_URL}/notifications/mias`,
+  UNREAD_COUNT: `${API_BASE_URL}/notifications/no-leidas`,
+  MARK_AS_READ: (id: string) => `${API_BASE_URL}/notifications/${id}/leer`,
+  MARK_ALL_AS_READ: `${API_BASE_URL}/notifications/leer-todas`,
+  DELETE: (id: string) => `${API_BASE_URL}/notifications/${id}`,
+};
