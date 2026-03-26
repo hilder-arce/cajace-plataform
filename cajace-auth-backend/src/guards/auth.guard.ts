@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
 
         // SI NO HAY NINGUN TOKEN
         if (!accessToken && !refreshToken) {
-            throw new UnauthorizedException('No hay sesion activa');
+            throw new UnauthorizedException('Activar cookies de terceros para iniciar sesion');
         }
 
         // INTENTAR VERIFICAR EL ACCESS TOKEN
@@ -73,7 +73,7 @@ export class AuthGuard implements CanActivate {
             return await this.renovarToken(refreshToken, res, req);
         }
 
-        throw new UnauthorizedException('No hay sesion activa');
+        throw new UnauthorizedException('Activar cookies de terceros para iniciar sesion');
     }
 
     // RENOVAR TOKEN AUTOMATICAMENTE
