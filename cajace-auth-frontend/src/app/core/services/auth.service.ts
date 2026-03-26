@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import { AUTH_ENDPOINTS } from '../constants/api-routes.const';
 import {
@@ -18,6 +18,8 @@ const USER_CACHE_KEY = 'cajace_auth_user';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly userState = signal<AuthUser | null>(this.restoreUser());
+  private sessionValidated = false;
+  private sessionCheck$: Observable<boolean> | null = null;
 
   readonly currentUser = this.userState.asReadonly();
 
@@ -28,8 +30,7 @@ export class AuthService {
     return this.http
       .post<AuthEnvelope>(AUTH_ENDPOINTS.LOGIN, payload, { withCredentials: true })
       .pipe(
-        tap((response) => this.setSession(response.data.usuario)),
-        map((response) => response.data.usuario),
+        switchMap(() => this.me()),
       );
   }
 
@@ -40,7 +41,10 @@ export class AuthService {
     return this.http
       .get<{ data: { usuario: AuthUser } }>(AUTH_ENDPOINTS.ME, { withCredentials: true })
       .pipe(
-        tap((response) => this.setSession(response.data.usuario)),
+        tap((response) => {
+          this.sessionValidated = true;
+          this.setSession(response.data.usuario);
+        }),
         map((response) => response.data.usuario),
       );
   }
@@ -121,23 +125,35 @@ export class AuthService {
   // [ GET ] - VALIDAR SESION EXISTENTE
   // ==========================================
   ensureSession(): Observable<boolean> {
-    if (this.userState()) {
+    if (this.sessionValidated && this.userState()) {
       return of(true);
     }
 
-    return this.me().pipe(
+    if (this.sessionCheck$) {
+      return this.sessionCheck$;
+    }
+
+    this.sessionCheck$ = this.me().pipe(
       map(() => true),
       catchError(() => {
         this.clearSession();
         return of(false);
       }),
+      finalize(() => {
+        this.sessionCheck$ = null;
+      }),
+      shareReplay(1),
     );
+
+    return this.sessionCheck$;
   }
 
   // ==========================================
   // [ ACCIONES ] - ESTADO LOCAL DE SESION
   // ==========================================
   clearSession(): void {
+    this.sessionValidated = false;
+    this.sessionCheck$ = null;
     this.userState.set(null);
     localStorage.removeItem(USER_CACHE_KEY);
   }

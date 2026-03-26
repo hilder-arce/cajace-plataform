@@ -42,11 +42,24 @@ export class DashboardHomeComponent implements OnInit {
   // [ CICLO DE VIDA ] - CARGA DE PERFIL
   // ==========================================
   ngOnInit(): void {
+    const currentUser = this.currentUser();
+    if (currentUser) {
+      this.quickActions = this.buildQuickActions();
+      this.loadingProfile = false;
+      return;
+    }
+
     this.authService
-      .me()
+      .ensureSession()
       .pipe(finalize(() => (this.loadingProfile = false)))
       .subscribe({
-        next: () => {
+        next: (isAuthenticated) => {
+          if (!isAuthenticated) {
+            this.authService.clearSession();
+            void this.router.navigate(['/login']);
+            return;
+          }
+
           this.quickActions = this.buildQuickActions();
         },
         error: () => {
