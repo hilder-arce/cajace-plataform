@@ -79,7 +79,7 @@ export class AuthGuard implements CanActivate {
     // RENOVAR TOKEN AUTOMATICAMENTE
     private async renovarToken(refreshToken: string, res: Response, req: Request): Promise<boolean> {
         try {
-            const nuevoPayload = await this.authService.refreshFromGuard(refreshToken, res);
+            const nuevoPayload = await this.authService.refreshFromGuard(refreshToken, req, res);
 
             req['user'] = nuevoPayload?.sessionId
                 ? await this.authService.buildRequestUserContext(nuevoPayload.sub, nuevoPayload.sessionId)

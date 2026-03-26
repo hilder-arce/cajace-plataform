@@ -34,7 +34,7 @@ export class AuthController {
   @Post('logout-all')
   async logoutAll(@Req() req: Request, @Res() res: Response) {
     const usuarioId = (req as any).user?.sub;
-    return await this.authService.logoutAll(usuarioId, res);
+    return await this.authService.logoutAll(usuarioId, req, res);
   }
 
   // ==========================================

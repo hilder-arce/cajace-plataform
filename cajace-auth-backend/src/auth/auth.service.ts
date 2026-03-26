@@ -64,7 +64,7 @@ export class AuthService {
     await session.save();
 
     // 6. PERSISTENCIA DE TOKENS EN COOKIES SEGURAS
-    this.setCookie(res, accessToken, refreshToken);
+    this.setCookie(req, res, accessToken, refreshToken);
 
     // 7. NOTIFICACIÓN DE SEGURIDAD POR INICIO DE SESIÓN
     await this.notificationsService.notificarLogin(
@@ -101,7 +101,7 @@ export class AuthService {
         // ERROR SILENCIADO: EL TOKEN PODRÍA ESTAR YA EXPIRADO
       }
 
-      this.clearCookies(res);
+      this.clearCookies(req, res);
       return res.json({ message: 'Sesión finalizada correctamente' });
     }
   }
@@ -109,7 +109,7 @@ export class AuthService {
   // ======================================================
   // [ AUTH ] - RENOVACIÓN DINÁMICA DE TOKENS (REFRESH)
   // ======================================================
-  async refreshFromGuard(refreshToken: string, res: Response): Promise<any> {
+  async refreshFromGuard(refreshToken: string, req: Request, res: Response): Promise<any> {
     let payload: any;
     try {
       payload = this.jwtService.verify(refreshToken, {
@@ -150,13 +150,13 @@ export class AuthService {
       const isTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
       if (!isTokenValid) {
         await this.sessionModel.findByIdAndUpdate(sessionId, { estado: false });
-        this.clearCookies(res);
+        this.clearCookies(req, res);
         throw new UnauthorizedException('Fallo crítico de seguridad: Refresh token comprometido');
       }
 
       if (session.expiraEn < new Date()) {
         await this.sessionModel.findByIdAndUpdate(sessionId, { estado: false });
-        this.clearCookies(res);
+        this.clearCookies(req, res);
         throw new UnauthorizedException('La sesión ha expirado por tiempo de inactividad');
       }
 
@@ -175,7 +175,7 @@ export class AuthService {
         bloqueadoEn: null,
       });
 
-      this.setCookie(res, accessToken, nuevoRefreshToken);
+      this.setCookie(req, res, accessToken, nuevoRefreshToken);
       return this.jwtService.decode(accessToken);
 
     } catch (error) {
@@ -190,7 +190,7 @@ export class AuthService {
   // ======================================================
   // [ AUTH ] - CIERRE GLOBAL DE SESIONES
   // ======================================================
-  async logoutAll(usuarioId: string, res: Response) {
+  async logoutAll(usuarioId: string, req: Request, res: Response) {
     const activeSessions = await this.sessionModel
       .find({
         usuario: new Types.ObjectId(usuarioId),
@@ -208,7 +208,7 @@ export class AuthService {
 
     this.notificationsService.emitirCierreGlobalSesiones(usuarioId, sessionIds);
 
-    this.clearCookies(res);
+    this.clearCookies(req, res);
     return res.json({ message: 'Todas las sesiones activas han sido revocadas exitosamente' });
   }
 
@@ -281,7 +281,7 @@ export class AuthService {
         const payload = this.jwtService.verify(currentRefreshToken, {
           secret: this.configService.get('JWT_REFRESH_SECRET'),
         });
-        if (payload.sub === sessionId) this.clearCookies(res);
+        if (payload.sub === sessionId) this.clearCookies(req, res);
       } catch (error) {}
     }
 
@@ -479,12 +479,12 @@ export class AuthService {
     );
   }
 
-  private setCookie(res: Response, accessToken: string, refreshToken: string) {
-    const isProduction = this.configService.get('NODE_ENV') === 'production';
+  private setCookie(req: Request, res: Response, accessToken: string, refreshToken: string) {
+    const isCrossSiteRequest = this.isCrossSiteRequest(req);
     const cookieOptions = {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+      secure: isCrossSiteRequest,
+      sameSite: (isCrossSiteRequest ? 'none' : 'lax') as 'none' | 'lax',
     };
     
     res.cookie('access_token', accessToken, {
@@ -498,16 +498,26 @@ export class AuthService {
     });
   }
 
-  private clearCookies(res: Response) {
-    const isProduction = this.configService.get('NODE_ENV') === 'production';
+  private clearCookies(req: Request, res: Response) {
+    const isCrossSiteRequest = this.isCrossSiteRequest(req);
     const clearOptions = {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+      secure: isCrossSiteRequest,
+      sameSite: (isCrossSiteRequest ? 'none' : 'lax') as 'none' | 'lax',
     };
 
     res.clearCookie('access_token', clearOptions);
     res.clearCookie('refresh_token', clearOptions);
+  }
+
+  private isCrossSiteRequest(req: Request): boolean {
+    const origin = req.headers.origin ?? req.headers.referer ?? '';
+    const normalizedOrigin = String(origin).toLowerCase();
+
+    return !(
+      normalizedOrigin.includes('localhost') ||
+      normalizedOrigin.includes('127.0.0.1')
+    );
   }
 
   private formatearUsuario(user: any) {
