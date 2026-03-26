@@ -276,6 +276,16 @@ export class NotificationsService {
 
   }
 
+  emitirCierreGlobalSesiones(usuarioId: string, sessionIds: string[]) {
+    sessionIds.forEach((sessionId) => {
+      this.gateway.emitToSession(sessionId, 'logout_session', {
+        message: 'Todas tus sesiones activas fueron cerradas por una accion de seguridad',
+      });
+    });
+
+    this.gateway.emitToUser(usuarioId, 'update_sessions', { refresh: true });
+  }
+
   // ======================================================
   // [ EVENTS ] - NOTIFICACIONES DE CAMBIO DE CREDENCIALES
   // ======================================================

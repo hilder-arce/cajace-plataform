@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { finalize, firstValueFrom, Subscription } from 'rxjs';
 
 import { UserSession } from '../../../core/models/auth.models';
@@ -22,6 +23,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly notificationsService = inject(NotificationsService);
   private readonly alertService = inject(AlertService);
+  private readonly router = inject(Router);
   private sessionsSub?: Subscription;
 
   // ==========================================
@@ -83,7 +85,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
           .pipe(finalize(() => this.loading.set(false)))
           .subscribe({
             next: () => {
-              this.loadSessions();
+              this.authService.clearSession();
+              void this.router.navigate(['/login']);
             },
           });
       },

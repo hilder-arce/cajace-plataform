@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import { AUTH_ENDPOINTS } from '../constants/api-routes.const';
+import { SKIP_AUTH_REDIRECT } from '../interceptors/permission-denied.interceptor';
 import {
   AuthEnvelope,
   AuthUser,
@@ -38,8 +39,15 @@ export class AuthService {
   // [ GET ] - OBTENER USUARIO AUTENTICADO
   // ==========================================
   me(): Observable<AuthUser> {
+    return this.fetchMe();
+  }
+
+  private fetchMe(skipAuthRedirect = false): Observable<AuthUser> {
     return this.http
-      .get<{ data: { usuario: AuthUser } }>(AUTH_ENDPOINTS.ME, { withCredentials: true })
+      .get<{ data: { usuario: AuthUser } }>(AUTH_ENDPOINTS.ME, {
+        withCredentials: true,
+        context: new HttpContext().set(SKIP_AUTH_REDIRECT, skipAuthRedirect),
+      })
       .pipe(
         tap((response) => {
           this.sessionValidated = true;
@@ -133,7 +141,7 @@ export class AuthService {
       return this.sessionCheck$;
     }
 
-    this.sessionCheck$ = this.me().pipe(
+    this.sessionCheck$ = this.fetchMe(true).pipe(
       map(() => true),
       catchError(() => {
         this.clearSession();

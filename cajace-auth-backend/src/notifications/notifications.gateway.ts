@@ -11,7 +11,10 @@ import * as cookie from 'cookie';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:4200', // Reemplaza con tu URL de frontend
+    origin: (process.env.CORS_ORIGINS ?? 'http://localhost:4200,http://127.0.0.1:4200,https://cajace-auth-frontend.onrender.com')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
     credentials: true,
   },
 })

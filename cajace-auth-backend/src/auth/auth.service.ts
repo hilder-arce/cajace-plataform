@@ -191,10 +191,23 @@ export class AuthService {
   // [ AUTH ] - CIERRE GLOBAL DE SESIONES
   // ======================================================
   async logoutAll(usuarioId: string, res: Response) {
+    const activeSessions = await this.sessionModel
+      .find({
+        usuario: new Types.ObjectId(usuarioId),
+        estado: true,
+      })
+      .select('_id')
+      .lean();
+
+    const sessionIds = activeSessions.map((session) => session._id.toString());
+
     await this.sessionModel.updateMany(
       { usuario: new Types.ObjectId(usuarioId), estado: true }, 
       { estado: false }
     );
+
+    this.notificationsService.emitirCierreGlobalSesiones(usuarioId, sessionIds);
+
     this.clearCookies(res);
     return res.json({ message: 'Todas las sesiones activas han sido revocadas exitosamente' });
   }
@@ -468,25 +481,33 @@ export class AuthService {
 
   private setCookie(res: Response, accessToken: string, refreshToken: string) {
     const isProduction = this.configService.get('NODE_ENV') === 'production';
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+    };
     
     res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000,
     });
     
     res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
 
   private clearCookies(res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
+    const clearOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+    };
+
+    res.clearCookie('access_token', clearOptions);
+    res.clearCookie('refresh_token', clearOptions);
   }
 
   private formatearUsuario(user: any) {
